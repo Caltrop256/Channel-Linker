@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-class UnderNet extends global.Discord.Client {
+class ChannelLinker extends global.Discord.Client {
     constructor() {
         super({
             retryLimit: 30,

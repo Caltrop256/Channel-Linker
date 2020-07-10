@@ -1,6 +1,6 @@
 global.Discord = require('discord.js');
-const UnderNet = require('./UnderNet.js');
-global.client = new UnderNet();
+const ChannelLinker = require('./ChannelLinker.js');
+global.client = new ChannelLinker();
 
 let input = '',
     stdin = process.openStdin();
