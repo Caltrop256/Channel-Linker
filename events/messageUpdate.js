@@ -1,8 +1,8 @@
 const { DiscordAPIError } = require("discord.js")
 
 module.exports = {
-    run: function (message) {
-        if (client.connectedChannels.includes(message.channel.id)) {
+    run: function (message, newmsg) {
+        if (client.connectedChannels.includes(message.channel.id) && message.content != newmsg.content) {
             message.author.send({
                 embed: new Discord.MessageEmbed()
                     .setAuthor('Edits are not seen by other servers on the UnderNet!')
