@@ -1,4 +1,5 @@
 const fs = require('fs');
+const { Channel } = require('discord.js');
 
 class ChannelLinker extends global.Discord.Client {
     constructor() {
@@ -95,4 +96,4 @@ class ChannelLinker extends global.Discord.Client {
 
 };
 
-module.exports = UnderNet;
+module.exports = ChannelLinker;
