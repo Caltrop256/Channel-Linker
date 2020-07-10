@@ -1,0 +1,9 @@
+{
+    "token": "discord_token",
+    "channels": [
+        "channel id 1",
+        "channel id 2",
+        "channel id 3",
+        "etc"
+    ]
+}
