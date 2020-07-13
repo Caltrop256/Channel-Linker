@@ -10,16 +10,22 @@ class ChannelLinker extends global.Discord.Client {
         this.config = require('./config.json');
 
         this.connectedChannels = this.config.channels;
+        this.maxCacheSize = ~~this.config.cacheSizeLimit;
         this.hooks = new Map();
         this.messages = new Map();
         this.parentMessageId = new Map();
 
         super.login(this.config.token);
         this.once('ready', async () => {
+            let isNSFW = false,
+                rateLimit = 0;
             for (let i = 0; i < this.connectedChannels.length; ++i) {
                 const channel = this.channels.resolve(this.connectedChannels[i]),
                     hooks = await channel.fetchWebhooks(),
                     hA = Array.from(hooks);
+
+                if (channel.nsfw) isNSFW = true;
+                if (channel.rateLimitPerUser > rateLimit) rateLimit = channel.rateLimitPerUser;
                 for (let j = 0; j < hA.length; ++j) {
                     if (hA[j][1].owner.id == this.user.id) {
                         this.hooks.set(this.connectedChannels[i], hA[j][1]);
@@ -34,6 +40,12 @@ class ChannelLinker extends global.Discord.Client {
                     this.hooks.set(this.connectedChannels[i], hook);
                 }
             };
+
+            for (let i = 0; i < this.connectedChannels.length; ++i) {
+                const channel = this.channels.resolve(this.connectedChannels[i]);
+                channel.setNSFW(isNSFW);
+                channel.setRateLimitPerUser(rateLimit);
+            }
             fs.readdir('./events/', (err, events) => {
                 if (err) throw err;
                 for (let i = 0; i < events.length; ++i) {

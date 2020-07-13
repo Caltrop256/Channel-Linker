@@ -1,5 +1,6 @@
 {
     "token": "discord_token",
+    "cacheSizeLimit": 300,
     "channels": [
         "channel id 1",
         "channel id 2",
