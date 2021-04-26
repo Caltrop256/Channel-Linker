@@ -8,7 +8,7 @@ module.exports = {
                 const channelId = client.connectedChannels[i];
                 if (channelId == message.channel.id) continue;
 
-                const msg = await client.sendHookMessage(channelId, message.author.id, message,once++);
+                const msg = await client.sendHookMessage(channelId, message.author.id, message,!once++);
                 hookMessages.push(msg);
                 client.parentMessageId.set(msg.id, message.id);
             }
