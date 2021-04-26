@@ -4,11 +4,11 @@ module.exports = {
             if (message.webhookID && message.webhookID == client.hooks.get(message.channel.id).id) return;
             const hookMessages = [message];
 
-            for (let i = 0; i < client.connectedChannels.length; ++i) {
+            for (let i = 0,once = 0; i < client.connectedChannels.length; ++i) {
                 const channelId = client.connectedChannels[i];
                 if (channelId == message.channel.id) continue;
 
-                const msg = (await client.sendHookMessage(channelId, message.author.id, message))[0];
+                const msg = await client.sendHookMessage(channelId, message.author.id, message,once++);
                 hookMessages.push(msg);
                 client.parentMessageId.set(msg.id, message.id);
             }
