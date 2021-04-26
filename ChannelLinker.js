@@ -112,7 +112,7 @@ class ChannelLinker extends global.Discord.Client {
                     embed: new Discord.MessageEmbed()
                         .setAuthor('Some files not successfully sent!')
                         .setDescription(`The following files were unable to be sent: ${blockedAttachments.map(blockedAttachment => blockedAttachment.url).join(' , ')} . `+
-                        ((msg.attachments.size > 1) ? "Please try uploading these files in a seperate message for others to see them." : 
+                        (data.files.length ? "Please try uploading these files in a seperate message for others to see them." : 
                         (user.isNitro ? "The bot cannot upload an 8MB+ file like a nitro user" :
                         "Due to it being next to impossible to determine if a file sent by a user can be sent to all connected channels by the bot, the limit we use has been reduced a little bit below the actual limit provided by discord. We're very sorry for the inconvenience.")))
                         .setColor(0xD5622C)
