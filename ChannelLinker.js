@@ -61,12 +61,13 @@ class ChannelLinker extends global.Discord.Client {
         return new Promise((resolve) => {
             this.users.fetch(userId).then(user => {
                 const data = {
-                    avatar: user.avatarURL({
+                    avatar: user.displayAvatarURL({
                         format: 'png',
                         dynamic: true,
                         size: 512
                     }),
-                    name: user.username
+                    name: user.username,
+                    isNitro:user.avatar && user.avatar.startsWith('a_')
                 };
 
                 if (guildId) {
@@ -78,7 +79,7 @@ class ChannelLinker extends global.Discord.Client {
         });
     };
 
-    sendHookMessage = (channelId, userId, msg) => {
+    sendHookMessage = (channelId, userId, msg,once) => {
         return new Promise(async (resolve, reject) => {
             const hook = this.hooks.get(channelId),
                 channel = this.channels.resolve(channelId),
@@ -86,15 +87,36 @@ class ChannelLinker extends global.Discord.Client {
                 data = {
                     username: user.name,
                     avatarURL: user.avatar,
-                    embeds: msg.embeds,
-                    tts: false,
-                    split: {
-                        maxLength: 2000
-                    }
+                    embeds: msg.embeds.filter(embed => embed.type == 'rich'),
+                    tts: false
                 };
+            let blockedAttachments = [] 
             if (msg.attachments.size) {
-                data.files = Array.from(msg.attachments).map(a => a[1].proxyURL);
+                data.files = [];
+                const fileArr = Array.from(msg.attachments).map(a => a[1]);
+                let totalSize = 0;
+                for(let i = 0; i < fileArr.length;++i)
+                {
+                    const file = fileArr[i];
+                    if((totalSize + file.size) > 8_000_000)
+                    {
+                        blockedAttachments.push(file);
+                        continue;
+                    }
+                    data.files.push(file.url);
+                    totalSize += file.size;
+                }
             }
+            if(blockedAttachments.length && once) //once used to only show the message once
+                msg.author.send({
+                    embed: new Discord.MessageEmbed()
+                        .setAuthor('Some files not successfully sent!')
+                        .setDescription(`The following files were unable to be sent: ${blockedAttachments.map(blockedAttachment => blockedAttachment.url).join(' , ')} . `+
+                        (data.files.length ? "Please try uploading these files in a seperate message for others to see them." : 
+                        (user.isNitro ? "The bot cannot upload an 8MB+ file like a nitro user" :
+                        "Due to it being next to impossible to determine if a file sent by a user can be sent to all connected channels by the bot, the limit we use has been reduced a little bit below the actual limit provided by discord. We're very sorry for the inconvenience.")))
+                        .setColor(0xD5622C)
+                }).catch(() => { }); //catch reject if user doesnt have DMs public
 
             // note that the '** **' produces a space since
             // the discord.js library makes the promise resolve to undefined
